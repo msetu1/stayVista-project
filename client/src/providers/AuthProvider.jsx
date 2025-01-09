@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+import PropTypes from 'prop-types'
 import { createContext, useEffect, useState } from 'react'
 import {
   GoogleAuthProvider,
@@ -12,7 +12,7 @@ import {
   updateProfile,
 } from 'firebase/auth'
 import { app } from '../firebase/firebase.config'
-
+import axios from 'axios'
 export const AuthContext = createContext(null)
 const auth = getAuth(app)
 const googleProvider = new GoogleAuthProvider()
@@ -41,8 +41,11 @@ const AuthProvider = ({ children }) => {
     return sendPasswordResetEmail(auth, email)
   }
 
-  const logOut = () => {
+  const logOut = async () => {
     setLoading(true)
+    await axios.get(`${import.meta.env.VITE_API_URL}/logout`, {
+      withCredentials: true,
+    })
     return signOut(auth)
   }
 
@@ -52,12 +55,23 @@ const AuthProvider = ({ children }) => {
       photoURL: photo,
     })
   }
+  // Get token from server
+  const getToken = async email => {
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_API_URL}/jwt`,
+      { email },
+      { withCredentials: true }
+    )
+    return data
+  }
 
   // onAuthStateChange
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, currentUser => {
       setUser(currentUser)
-      console.log('CurrentUser-->', currentUser)
+      if (currentUser) {
+        getToken(currentUser.email)
+      }
       setLoading(false)
     })
     return () => {
@@ -80,6 +94,11 @@ const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>
   )
+}
+
+AuthProvider.propTypes = {
+  // Array of children.
+  children: PropTypes.array,
 }
 
 export default AuthProvider

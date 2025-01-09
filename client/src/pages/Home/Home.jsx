@@ -1,12 +1,17 @@
-import { Helmet } from "react-helmet-async"
+import { Helmet } from 'react-helmet-async'
+import Categories from '../../components/Categories/Categories'
+import Rooms from '../../components/Home/Rooms'
 
 const Home = () => {
   return (
     <div>
       <Helmet>
-        <title>StayVista | Home</title>
+        <title>StayVista | Vacation Homes & Condo Rentals</title>
       </Helmet>
-      <h1>Welcome to StayVista</h1>
+      {/* Categories section  */}
+      <Categories />
+      {/* Rooms section */}
+      <Rooms />
     </div>
   )
 }

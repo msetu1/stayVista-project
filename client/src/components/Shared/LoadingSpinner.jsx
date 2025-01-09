@@ -1,7 +1,7 @@
-/* eslint-disable react/prop-types */
+import PropTypes from 'prop-types'
 import { ScaleLoader } from 'react-spinners'
 
-const Loader = ({ smallHeight }) => {
+const LoadingSpinner = ({ smallHeight }) => {
   return (
     <div
       className={` ${smallHeight ? 'h-[250px]' : 'h-[70vh]'}
@@ -15,4 +15,8 @@ const Loader = ({ smallHeight }) => {
   )
 }
 
-export default Loader
+LoadingSpinner.propTypes = {
+  smallHeight: PropTypes.bool,
+}
+
+export default LoadingSpinner

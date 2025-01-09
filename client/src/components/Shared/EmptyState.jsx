@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
-import Button from '../../components/Button/Button'
+import PropTypes from 'prop-types'
+import Button from '../../components/Shared/Button/Button'
 import { Link } from 'react-router-dom'
 const EmptyState = ({ message, address, label }) => {
   return (
@@ -10,6 +10,12 @@ const EmptyState = ({ message, address, label }) => {
       </Link>
     </div>
   )
+}
+
+EmptyState.propTypes = {
+  message: PropTypes.string,
+  address: PropTypes.string,
+  label: PropTypes.string,
 }
 
 export default EmptyState

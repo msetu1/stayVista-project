@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+import PropTypes from 'prop-types'
 const Button = ({ label, onClick, disabled, outline, small, icon: Icon }) => {
   return (
     <button
@@ -35,6 +35,15 @@ const Button = ({ label, onClick, disabled, outline, small, icon: Icon }) => {
       {label}
     </button>
   )
+}
+
+Button.propTypes = {
+  label: PropTypes.string,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  outline: PropTypes.bool,
+  small: PropTypes.bool,
+  icon: PropTypes.elementType,
 }
 
 export default Button
