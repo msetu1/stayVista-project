@@ -7,7 +7,7 @@ import useAxiosCommon from "../../hooks/useAxiosCommon";
 import { useSearchParams } from "react-router-dom";
 
 const Rooms = () => {
-  const axiosSecure = useAxiosCommon();
+  const axiosCommon = useAxiosCommon();
 
   // eslint-disable-next-line no-unused-vars
   const [params, setParams] = useSearchParams();
@@ -16,7 +16,7 @@ const Rooms = () => {
   const { data: rooms = {}, isLoading } = useQuery({
     queryKey: ["rooms", category],
     queryFn: async () => {
-      const { data } = await axiosSecure.get(`/rooms?category=${category}`);
+      const { data } = await axiosCommon.get(`/rooms?category=${category}`);
       return data;
     },
   });

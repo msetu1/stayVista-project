@@ -8,12 +8,13 @@ const CategoryBox = ({ label, icon: Icon }) => {
   const navigate = useNavigate();
 
   const handleClickCategory = () => {
+    // create query string
     const currentQuery = { category: label };
-
     const url = queryString.stringifyUrl({
       url: "/",
       query: currentQuery,
     });
+    // query string
     navigate(url);
   };
   return (
