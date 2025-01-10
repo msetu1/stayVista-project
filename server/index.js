@@ -50,6 +50,7 @@ async function run() {
     // collection
     const collections = client.db("stay-vista");
     const roomsCollection = collections.collection("rooms");
+    const usersCollection = collections.collection("users");
 
     // auth related api
     app.post("/jwt", async (req, res) => {
@@ -79,6 +80,49 @@ async function run() {
       } catch (err) {
         res.status(500).send(err);
       }
+    });
+
+    // save a user data in db
+    app.put("/user", async (req, res) => {
+      const user = req.body;
+      const query = { email: user?.email };
+      // check if user already exists in db
+      const isExists = await usersCollection.findOne(query);
+      if (isExists) {
+        if (user.status === "Requested") {
+          const result = await usersCollection.updateOne(query, {
+            $set: { status: user?.status },
+          });
+          return res.send(result);
+        } else {
+          return res.send(isExists);
+        }
+      }
+
+      // save user for the first time
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          ...user,
+          timestamp: Date.now(),
+        },
+      };
+      const result = await usersCollection.updateOne(query, updateDoc, options);
+      res.send(result);
+    });
+
+    // get a user info by email for db
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await usersCollection.findOne({ email });
+
+      res.send(result);
+    });
+
+    // get all users data form db
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
     });
 
     // get all rooms
