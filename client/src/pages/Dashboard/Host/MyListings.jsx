@@ -10,7 +10,7 @@ const MyListings = () => {
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
 
-  // Fetch rows all data
+  // Fetch  all room data
   const {
     data: rooms = [],
     isLoading,

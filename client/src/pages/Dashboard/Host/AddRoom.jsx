@@ -55,8 +55,8 @@ const AddRoom = () => {
     const image = form.image.files[0];
     const host = {
       name: user?.displayName,
-      image: user?.photoURL,
       email: user?.email,
+      image: user?.photoURL,
     };
 
     try {

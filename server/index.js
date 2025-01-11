@@ -125,6 +125,8 @@ async function run() {
       res.send({ clientSecret: client_secret });
     });
 
+    // -------- user: role start code--------//
+    // user is required
     app.put("/user", async (req, res) => {
       const user = req.body;
       const query = { email: user?.email };
@@ -182,7 +184,9 @@ async function run() {
       const result = await usersCollection.updateOne(query, updateDoc);
       res.send(result);
     });
+    // -------- user: role end code--------//
 
+    // -------- Room start code--------//
     // get all rooms
     app.get("/rooms", async (req, res) => {
       const category = req.query.category;
@@ -200,7 +204,9 @@ async function run() {
       const result = await roomsCollection.findOne(query);
       res.send(result);
     });
+    // -------- Room end code--------//
 
+    // -------- Host start code--------//
     // Save a room data Add room
     app.post("/room", verifyToken, verifyHost, async (req, res) => {
       const result = await roomsCollection.insertOne(req.body);
@@ -227,7 +233,9 @@ async function run() {
       const result = await roomsCollection.deleteOne(query);
       res.send(result);
     });
+    // -------- Host end code--------//
 
+    // -------- Guest start code--------//
     // save a guest booking room
     app.post("/booking", verifyToken, async (req, res) => {
       const bookingData = req?.body;
@@ -251,6 +259,25 @@ async function run() {
       const result = await roomsCollection.updateOne(query, updateDoc);
       res.send(result);
     });
+
+    // get all booking for a guest
+    app.get("/my-bookings/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { "guest.email": email };
+
+      const result = await bookingsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //  delete a booking
+    app.delete("/booking/:id", verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await bookingsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // -------- Guest end code--------//
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
