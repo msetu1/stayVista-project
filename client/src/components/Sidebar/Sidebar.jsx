@@ -1,25 +1,32 @@
 import { useState } from "react";
 import { GrLogout } from "react-icons/gr";
 import { FcSettings } from "react-icons/fc";
-import { BsFillHouseAddFill } from "react-icons/bs";
 import { AiOutlineBars } from "react-icons/ai";
 import { BsGraphUp } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { MdHomeWork } from "react-icons/md";
 import useAuth from "../../hooks/useAuth";
 import { useRole } from "../../hooks/useRole";
 import MenuItem from "./Menu/MenuItem";
+import HostMenu from "./Menu/HostMenu";
+import GuestMenu from "./Menu/GuestMenu";
+import AdminMenu from "./Menu/AdminMenu";
+import ToggleBtn from "../Button/ToggleBtn";
 
 const Sidebar = () => {
   const { logOut } = useAuth();
   const [role] = useRole();
   const [isActive, setActive] = useState(false);
-  console.log(role)
+  const [toggle, setToggle] = useState(true);
 
   // Sidebar Responsive Handler
   const handleToggle = () => {
     setActive(!isActive);
   };
+
+  const toggleHandler = (event) => {
+    setToggle(event.target.checked);
+  };
+
   return (
     <>
       {/* Small Screen Navbar */}
@@ -70,6 +77,9 @@ const Sidebar = () => {
           {/* Nav Items */}
           <div className="flex flex-col justify-between flex-1 mt-6">
             {/* Conditional toggle button here.. */}
+            {role === "host" && (
+              <ToggleBtn toggleHandler={toggleHandler} toggle={toggle} />
+            )}
 
             {/*  Menu Items */}
             <nav>
@@ -79,20 +89,9 @@ const Sidebar = () => {
                 address={"/dashboard"}
                 icon={BsGraphUp}
               />
-
-              {/* Add Room */}
-              <MenuItem
-                label={"Add Room"}
-                address={"add-room"}
-                icon={BsFillHouseAddFill}
-              />
-
-              {/* My Listing */}
-              <MenuItem
-                label={"My Listings"}
-                address={"my-listings"}
-                icon={MdHomeWork}
-              />
+              {role === "guest" && <GuestMenu />}
+              {role === "host" ? toggle ? <HostMenu /> : <GuestMenu />:undefined}
+              {role === "admin" && <AdminMenu />}
             </nav>
           </div>
         </div>
