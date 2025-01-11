@@ -5,13 +5,16 @@ import { useEffect, useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import PropTypes from "prop-types";
 import useAuth from "../../hooks/useAuth";
+import toast from "react-hot-toast";
 import { ImSpinner9 } from "react-icons/im";
+import { useNavigate } from "react-router-dom";
 
-const CheckoutForm = ({ closeModal, bookingInfo }) => {
+const CheckoutForm = ({ closeModal, bookingInfo, refetch }) => {
   const { user } = useAuth();
   const stripe = useStripe();
   const elements = useElements();
   const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
   const [clientSecret, setClientSecret] = useState("");
   const [cardError, setCardError] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -91,14 +94,33 @@ const CheckoutForm = ({ closeModal, bookingInfo }) => {
       // 1. Create payment info object
       const paymentInfo = {
         ...bookingInfo,
+        roomId: bookingInfo._id,
         transactionId: paymentIntent.id,
         date: new Date(),
       };
+      delete paymentInfo._id;
       console.log(paymentInfo);
 
-      // 2. set payment info booking in  collection (db)
-      // 3. change room status to booked in db
+      try {
+        // 2. set payment info booking in  collection (db)
+        const { data } = await axiosSecure.post("/booking", paymentInfo);
+        console.log(data);
+
+        // 3. change room status to booked in db
+        await axiosSecure.patch(`/room/status/${bookingInfo?._id}`, {
+          status: true,
+        });
+
+        // update ui
+        refetch();
+        closeModal();
+        toast.success("Room booked successfully");
+        navigate("/dashboard/my-bookings");
+      } catch (err) {
+        console.log(err);
+      }
     }
+
     setProcessing(false);
   };
 
@@ -150,6 +172,7 @@ const CheckoutForm = ({ closeModal, bookingInfo }) => {
 CheckoutForm.propTypes = {
   bookingInfo: PropTypes.object,
   closeModal: PropTypes.func,
+  refetch: PropTypes.func,
 };
 
 export default CheckoutForm;

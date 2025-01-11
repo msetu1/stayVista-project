@@ -49,9 +49,10 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // collection
-    const collections = client.db("stay-vista");
-    const roomsCollection = collections.collection("rooms");
-    const usersCollection = collections.collection("users");
+    const db = client.db("stay-vista");
+    const roomsCollection = db.collection("rooms");
+    const usersCollection = db.collection("users");
+    const bookingsCollection = db.collection("bookings");
 
     // verify admin middleware
     const verifyAdmin = async (req, res, next) => {
@@ -224,6 +225,30 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await roomsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // save a guest booking room
+    app.post("/booking", verifyToken, async (req, res) => {
+      const bookingData = req?.body;
+      const result = await bookingsCollection.insertOne(bookingData);
+
+      res.send(result);
+    });
+
+    // update room status
+    app.patch("/room/status/:id", async (req, res) => {
+      const id = req.params.id;
+      const status = req.body.status;
+
+      // change room availability
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          booked: status,
+        },
+      };
+      const result = await roomsCollection.updateOne(query, updateDoc);
       res.send(result);
     });
 
