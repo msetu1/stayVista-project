@@ -2,8 +2,12 @@ import { format } from "date-fns";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import DeleteModal from "../Modal/DeleteModal";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import toast from "react-hot-toast";
 
 const BookingDataRow = ({ booking, refetch }) => {
+  const axiosSecure = useAxiosSecure();
   const [isOpen, setIsOpen] = useState(false);
 
   // close modal
@@ -11,9 +15,26 @@ const BookingDataRow = ({ booking, refetch }) => {
     setIsOpen(false);
   };
 
-  // handle delete modal
+  // delete
+  const { mutateAsync } = useMutation({
+    mutationFn: async (id) => {
+      const { data } = await axiosSecure.delete(`/room/${id}`);
+      return data;
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      refetch();
+      toast.success("Room deleted successfully");
+    },
+  });
+
+  // handle delete data
   const handleDelete = async (id) => {
-    console.log(id);
+    try {
+      await mutateAsync(id);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
