@@ -26,6 +26,7 @@ const UpdateRoomModal = ({ setIsEditModalOpen, isOpen, refetch, room }) => {
   // date range handler
   const handleDates = (item) => {
     setDates(item.selection);
+    setRoomData({...roomData,to:item.selection.endDate,from:item.selection.startDate})
   };
 
   // handle image update
@@ -48,7 +49,6 @@ const UpdateRoomModal = ({ setIsEditModalOpen, isOpen, refetch, room }) => {
     e.preventDefault();
     const updateRoomData = Object.assign({}, roomData);
     delete updateRoomData._id;
-    console.log(updateRoomData);
 
     try {
       const { data } = await axiosSecure.put(
