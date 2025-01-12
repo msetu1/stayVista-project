@@ -3,20 +3,21 @@ import useAuth from "../../../hooks/useAuth";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 import BookingDataRow from "../../../components/TableRows/BookingDataRow";
+import LoadingSpinner from "../../../components/Shared/LoadingSpinner";
 
 const MyBookings = () => {
-  const { user } = useAuth();
+  const { user} = useAuth();
   const axiosSecure = useAxiosSecure();
 
   // fetch all bookings data
-  const { data: bookings = [], refetch } = useQuery({
+  const { data: bookings = [], refetch,isLoading } = useQuery({
     queryKey: ["my-bookings", user?.email],
     queryFn: async () => {
       const { data } = await axiosSecure.get(`/my-bookings/${user?.email}`);
       return data;
     },
   });
-  console.log(bookings);
+  if (isLoading) return <LoadingSpinner />;
   return (
     <>
       <Helmet>

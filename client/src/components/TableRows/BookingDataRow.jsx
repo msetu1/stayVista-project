@@ -18,13 +18,18 @@ const BookingDataRow = ({ booking, refetch }) => {
   // delete
   const { mutateAsync } = useMutation({
     mutationFn: async (id) => {
-      const { data } = await axiosSecure.delete(`/room/${id}`);
+      const { data } = await axiosSecure.delete(`/booking/${id}`);
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: async(data) => {
       console.log(data);
       refetch();
-      toast.success("Room deleted successfully");
+      toast.success("Booking cancelled!");
+
+      // change room booked status back to false
+      await axiosSecure.patch(`/room/status/${booking?.roomId}`, {
+        status: false,
+      });
     },
   });
 
