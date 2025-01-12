@@ -6,9 +6,67 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
+import UpdateRoomForm from "../Form/UpdateRoomForm";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { imageUpload } from "../../api/utils";
+import toast from "react-hot-toast";
 
-const UpdateRoomModal = ({ setIsEditModalOpen, isOpen }) => {
+const UpdateRoomModal = ({ setIsEditModalOpen, isOpen, refetch, room }) => {
+  const axiosSecure = useAxiosSecure();
+  const [loading, setLoading] = useState(false);
+  const [roomData, setRoomData] = useState(room);
+
+  const [dates, setDates] = useState({
+    startDate: new Date(room?.from),
+    endDate: new Date(room?.to),
+    key: "selection",
+  });
+
+  // date range handler
+  const handleDates = (item) => {
+    setDates(item.selection);
+  };
+
+  // handle image update
+  const handleImage = async (image) => {
+    setLoading(true);
+    try {
+      // upload image
+      const image_url = await imageUpload(image);
+      setRoomData({ ...roomData, image: image_url });
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      toast.error(err.message);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    setLoading(true);
+    e.preventDefault();
+    const updateRoomData = Object.assign({}, roomData);
+    delete updateRoomData._id;
+    console.log(updateRoomData);
+
+    try {
+      const { data } = await axiosSecure.put(
+        `/room/update/${room?._id}`,
+        updateRoomData
+      );
+      console.log(data);
+      refetch();
+      setIsEditModalOpen(false);
+      setLoading(false);
+      toast.success("Room Data updated successfully");
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      toast.error(err.message);
+    }
+  };
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
@@ -46,7 +104,18 @@ const UpdateRoomModal = ({ setIsEditModalOpen, isOpen }) => {
                 >
                   Update Room Info
                 </DialogTitle>
-                <div className="mt-2 w-full">{/* Update room form */}</div>
+                <div className="mt-2 w-full">
+                  {/* Update room form */}
+                  <UpdateRoomForm
+                    handleSubmit={handleSubmit}
+                    handleDates={handleDates}
+                    dates={dates}
+                    roomData={roomData}
+                    loading={loading}
+                    handleImage={handleImage}
+                    setRoomData={setRoomData}
+                  />
+                </div>
                 <hr className="mt-8 " />
                 <div className="mt-2 ">
                   <button

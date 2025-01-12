@@ -224,6 +224,18 @@ async function run() {
       }
     );
 
+    // Update a room for host data
+    app.put("/room/update/:id", verifyToken, verifyHost, async (req, res) => {
+      const id = req.params.id;
+      const roomData = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: roomData,
+      };
+      const result = await roomsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
     // delete a room for host
     app.delete("/room/:id", verifyToken, verifyHost, async (req, res) => {
       const id = req.params.id;
@@ -364,7 +376,7 @@ async function run() {
         totalBookings: bookingDetails.length,
         totalPrice,
         chartData,
-        hostSince:timestamp
+        hostSince: timestamp,
       });
     });
 
@@ -403,7 +415,7 @@ async function run() {
         totalBookings: bookingDetails.length,
         totalPrice,
         chartData,
-        guestSince:timestamp
+        guestSince: timestamp,
       });
     });
 

@@ -44,13 +44,8 @@ const MyListings = () => {
       toast.error(error.message);
     }
   };
-
-  // handle update data
-  const handleUpdate = (id) => {
-    console.log(id);
-  };
-
   if (isLoading) return <LoadingSpinner />;
+
   return (
     <>
       <Helmet>
@@ -115,7 +110,7 @@ const MyListings = () => {
                       key={room._id}
                       room={room}
                       handleDelete={handleDelete}
-                      handleUpdate={handleUpdate}
+                      refetch={refetch}
                     />
                   ))}
                 </tbody>
