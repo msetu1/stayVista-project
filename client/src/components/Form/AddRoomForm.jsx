@@ -57,7 +57,8 @@ const AddRoomForm = ({
                 onChange={(item) => handleDates(item)}
                 moveRangeOnFirstSelection={false}
                 ranges={[dates]}
-                dateDisplayFormat="yyyy-MM-dd" // Correct date format display
+                dateDisplayFormat="yyyy-MM-dd"
+                minDate={new Date()}
               />
             </div>
           </div>
