@@ -193,7 +193,7 @@ async function run() {
       // welcome new users
       sendEmail(user?.email, {
         subject: "Welcome to stayVista!",
-        message: `Hpe you will find you destination.`,
+        message: `Hope you will find you destination.`,
       });
       res.send(result);
     });
