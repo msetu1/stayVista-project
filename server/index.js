@@ -164,7 +164,7 @@ async function run() {
     });
 
     // -------- user: role Related Code--------//
-    // user is required
+    // save user is required
     app.put("/user", async (req, res) => {
       const user = req.body;
       const query = { email: user?.email };
@@ -190,6 +190,11 @@ async function run() {
         },
       };
       const result = await usersCollection.updateOne(query, updateDoc, options);
+      // welcome new users
+      sendEmail(user?.email, {
+        subject: "Welcome to stayVista!",
+        message: `Hpe you will find you destination.`,
+      });
       res.send(result);
     });
 
