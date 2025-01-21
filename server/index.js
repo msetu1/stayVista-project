@@ -22,16 +22,39 @@ app.use(express.json());
 app.use(cookieParser());
 
 // -------- send email--------//
-const sendEmail = async (emailAddress, emailData) => {
+const sendEmail = (emailAddress, emailData) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
     port: 587,
     secure: false, // true for port 465, false for other ports
     auth: {
-      user: "maddison53@ethereal.email",
-      pass: "password",
+      user: process.env.TRANSPORTER_EMAIL,
+      pass: process.env.TRANSPORTER_PASS,
     },
+  });
+
+  // verify connection configuration
+  transporter.verify(function (error, success) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Server is ready to take our messages");
+    }
+  });
+
+  const mailBody = {
+    from: `"StayVista" <${process.env.TRANSPORTER_EMAIL}>`, // sender address
+    to: emailAddress, // list of receivers
+    subject: emailData.subject, // Subject line
+    html: emailData.message, // html body
+  };
+  transporter.sendMail(mailBody, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent", info.response);
+    }
   });
 };
 
@@ -278,6 +301,18 @@ async function run() {
     app.post("/booking", verifyToken, async (req, res) => {
       const bookingData = req?.body;
       const result = await bookingsCollection.insertOne(bookingData);
+
+      // sent email to guest
+      sendEmail(bookingData?.guest?.email, {
+        subject: "Booking Successfully",
+        message: `You have successfully booked room through stayVista . Transaction id: ${bookingData.transactionId}`,
+      });
+
+      // sent email to host
+      sendEmail(bookingData?.host?.email, {
+        subject: "Your room got booked successfully!",
+        message: `Get ready to welcome ${bookingData.guest.name}`,
+      });
 
       res.send(result);
     });
